@@ -7,6 +7,7 @@ var myData;
 
 var map = L.map('map', {
     zoom: 2,
+    maxZoom:20,
     center: [51.505, -0.09],
 });
 
@@ -54,13 +55,22 @@ function loadData(countryList){
         }
 
       }})
+
+      var markers = L.markerClusterGroup();
+  
+      
+
+      
        groupData.clearLayers()
        groupData.addLayer(pointsFilter);   
        var newData = getFeaturesInView(groupData);
        var points = L.geoJSON(newData)
        groupData.removeLayer(pointsFilter);
-       groupData.addLayer(points).addTo(map);   
        console.log('new', newData);
+       
+       markers.addLayer(points);
+       //map.addLayer(markers);
+       groupData.addLayer(markers).addTo(map);   
   
 };
 
