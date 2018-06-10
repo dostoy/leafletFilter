@@ -1,0 +1,73 @@
+var map = L.map('map', {
+    zoom: 2,
+    center: [51.505, -0.09],
+});
+
+loadData()
+
+var groupData = L.layerGroup();
+var countries = [];
+var toggle = [];
+
+$('#btnBox').click(function(e){
+    groupData.clearLayers();
+    var divId = e.target.id
+    if(divId != 'All'){
+        var i = toggle.indexOf(divId);
+        (i == -1) ?  toggle.push(divId) : toggle.splice(i, 1);
+        countries = _.difference(countries, toggle); 
+        loadData(countries);
+    }else{
+        (groupData.getLayers().length > 0) ? groupData.clearLayers() : loadData(countries);  
+        }
+});
+
+
+$.getJSON('data/countries.geojson', function(data) {
+var countries = L.geoJSON(data).addTo(map);
+    })
+
+function loadData(countryList){
+
+    $.getJSON('data/pop.geojson', function(data) {
+        finalData = [];
+        myData = data.features
+        console.log(myData)
+        for(d in myData){
+            myData[d].properties.sov0name = myData[d].properties.sov0name.replace(/\s+/g, '');
+            countries.push(myData[d].properties.sov0name)
+            countries = _.uniq(countries);
+    
+        }
+  /*   for (f in myData){
+        if (map.getBounds().contains(myData[f].geometry.coordinates)){
+            finalData.push(myData[f]);
+        }
+    } */
+    console.log(finalData);
+
+    var points = L.geoJSON(myData, {filter: function (feature, layer) {
+        //console.log(map.getBounds())
+        if(countryList != undefined){
+                for (d in countryList){
+                    if(feature.properties.sov0name == countryList[d]){
+                    return true        
+                    }
+           }
+        }else{
+            return true;
+        }
+
+      }})
+    
+       groupData.addLayer(points);   
+       groupData.addLayer(points).addTo(map);
+       console.log(groupData)
+  
+});
+};
+
+
+
+
+

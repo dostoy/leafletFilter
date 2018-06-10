@@ -1,0 +1,1667 @@
+body {
+  background-color: #333; }
+  body h1 {
+    color: yellow; }
+
+#container {
+  height: 100vh;
+  width: 100vw; }
+
+.loading {
+  margin-top: 10em;
+  text-align: center;
+  color: gray; }
+
+/* 
+ * Leaflet TimeDimension v1.1.0 - 2017-10-13 
+ * 
+ * Copyright 2017 Biel Frontera (ICTS SOCIB) 
+ * datacenter@socib.es 
+ * http://www.socib.es/ 
+ * 
+ * Licensed under the MIT license. 
+ * 
+ * Demos: 
+ * http://apps.socib.es/Leaflet.TimeDimension/ 
+ * 
+ * Source: 
+ * git://github.com/socib/Leaflet.TimeDimension.git 
+ * 
+ */
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/fonts/glyphicons-halflings-regular.eot");
+  src: url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/fonts/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/fonts/glyphicons-halflings-regular.woff") format("woff"), url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/fonts/glyphicons-halflings-regular.ttf") format("truetype"), url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular") format("svg"); }
+
+.leaflet-bar-timecontrol {
+  background-color: #fff;
+  color: black; }
+
+.leaflet-bar-timecontrol * {
+  box-sizing: border-box; }
+
+.leaflet-bar-timecontrol .leaflet-control-timecontrol {
+  float: left;
+  height: 26px;
+  line-height: 26px;
+  border: solid #a5a5a5;
+  background-color: #fff;
+  border-width: 0 1px 0 0; }
+
+.leaflet-bar-timecontrol .leaflet-control-timecontrol:first-child {
+  border-radius: 4px 0 0 4px; }
+
+.leaflet-bar-timecontrol .leaflet-control-timecontrol:last-child {
+  border-radius: 0 4px 4px 0; }
+
+.leaflet-bar-timecontrol .leaflet-control-timecontrol:before {
+  font-family: "Glyphicons Halflings";
+  display: block; }
+
+.leaflet-bar-timecontrol .timecontrol-slider {
+  position: relative;
+  width: auto;
+  cursor: auto; }
+
+.leaflet-bar-timecontrol a.timecontrol-date,
+.leaflet-bar-timecontrol a.timecontrol-date:hover {
+  position: relative;
+  min-width: 150px;
+  width: auto;
+  padding: 0 10px 0 20px;
+  white-space: nowrap; }
+
+.leaflet-bar-timecontrol a.timecontrol-date.utc,
+.leaflet-bar-timecontrol a.timecontrol-date.utc:hover {
+  min-width: 185px; }
+
+.leaflet-bar-timecontrol a.timecontrol-date.loading,
+.leaflet-bar-timecontrol a.timecontrol-date.loading:hover {
+  background-color: #ffefa4; }
+
+.leaflet-bar-timecontrol .timecontrol-dateslider .slider {
+  width: 200px; }
+
+.leaflet-bar-timecontrol .timecontrol-speed {
+  white-space: nowrap;
+  cursor: auto; }
+
+.leaflet-bar-timecontrol .timecontrol-speed .slider {
+  width: 55px;
+  display: inline-block; }
+
+.leaflet-bar-timecontrol .timecontrol-speed .speed {
+  width: 55px;
+  display: inline-block;
+  float: left;
+  text-align: right; }
+
+.leaflet-bar-timecontrol .timecontrol-play,
+.leaflet-bar-timecontrol .timecontrol-play:hover {
+  position: relative; }
+
+.leaflet-bar-timecontrol .timecontrol-play span {
+  font-size: 10px; }
+
+.leaflet-bar-timecontrol a.timecontrol-play.loading {
+  background-color: #ffefa4; }
+
+/**
+* Slider/Knobs styles
+*/
+.timecontrol-slider .slider {
+  position: relative;
+  height: 12px;
+  margin: 6px;
+  border: 1px solid #a5a5a5;
+  cursor: pointer; }
+
+.timecontrol-slider .slider.has-limits {
+  margin-left: 15px;
+  margin-right: 15px;
+  background-color: #ddd; }
+
+.timecontrol-slider .slider.has-limits .range {
+  position: absolute;
+  height: 10px;
+  background-color: #fff;
+  /*opacity: 0.5;*/ }
+
+.timecontrol-slider .knob {
+  position: absolute;
+  width: 8px;
+  height: 22px;
+  background-color: #ddd;
+  border-radius: 2px;
+  border: 1px solid #a5a5a5;
+  /*use margins because on ie,leaflet will use top/left for positionning*/
+  margin-top: -6px;
+  margin-left: -4px;
+  cursor: ew-resize;
+  cursor: -webkit-grab;
+  cursor: -moz-grab; }
+
+.timecontrol-slider .knob:after {
+  /** Big transparent block on top of the knob for easier grabbing on touch device*/
+  content: ' ';
+  display: block;
+  position: absolute;
+  width: 20px;
+  top: -5px;
+  height: 32px;
+  left: -7px;
+  /* opacity: 0.5;
+    background: red;*/ }
+
+.timecontrol-slider .knob.upper,
+.timecontrol-slider .knob.lower {
+  width: 11px;
+  height: 20px;
+  border: none;
+  background-color: transparent; }
+
+.timecontrol-slider .knob.upper {
+  margin-top: -5px;
+  margin-left: -1px; }
+
+.timecontrol-slider .knob.lower {
+  margin-top: -5px;
+  margin-left: -10px; }
+
+.timecontrol-slider .knob.lower:after {
+  right: 0px;
+  left: initial; }
+
+.timecontrol-slider .knob.upper:after {
+  left: 0px; }
+
+.timecontrol-slider .knob.upper:before,
+.timecontrol-slider .knob.lower:before {
+  display: block;
+  content: '';
+  position: relative;
+  top: 2px;
+  width: 0;
+  height: 0;
+  border-style: solid; }
+
+.timecontrol-slider .knob.upper:before {
+  border-width: 16px 0 0 10px;
+  border-color: transparent transparent transparent #a5a5a5; }
+
+.timecontrol-slider .knob.lower:before {
+  border-width: 0 0 16px 10px;
+  border-color: transparent transparent #a5a5a5; }
+
+.timecontrol-slider .slider.dragging,
+.timecontrol-slider .dragging .knob,
+.timecontrol-slider .knob.leaflet-drag-target {
+  cursor: ew-resize;
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
+  cursor: -moz-grabbing; }
+
+/**
+* Icons definitions
+*/
+@-webkit-keyframes icon-rotation {
+  from {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+@keyframes icon-rotation {
+  from {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+.timecontrol-loop.looped,
+.timecontrol-loop.looped:hover {
+  background-color: #ddd;
+  color: #094F8E; }
+
+.timecontrol-backward:before,
+.timecontrol-forward:before,
+.timecontrol-stop:before,
+.timecontrol-play:before,
+.timecontrol-loop:before {
+  width: 100%;
+  text-align: center; }
+
+.timecontrol-play:before {
+  position: absolute;
+  content: "\e072"; }
+
+/*.timecontrol-play.play:before {
+    content: "\e072";
+}*/
+.timecontrol-play.reverse:before {
+  content: "\e072";
+  -ms-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1); }
+
+.timecontrol-play.pause:before {
+  content: "\e073"; }
+
+.timecontrol-play.reverse.pause:before {
+  -ms-transform: none;
+  -webkit-transform: none;
+  transform: none; }
+
+a.timecontrol-play.loading:before {
+  content: "\e031";
+  opacity: 0.2;
+  -webkit-animation: icon-rotation 6s infinite linear;
+  animation: icon-rotation 6s infinite linear; }
+
+.timecontrol-date.loading:before {
+  content: "\e031";
+  left: 5px;
+  position: absolute;
+  -webkit-animation: icon-rotation 6s infinite linear;
+  animation: icon-rotation 6s infinite linear; }
+
+.timecontrol-speed:before {
+  content: "\e141";
+  position: absolute;
+  left: 7px; }
+
+.timecontrol-stop:before {
+  content: "\e074"; }
+
+.timecontrol-forward:before {
+  content: "\e075"; }
+
+.timecontrol-backward:before {
+  content: "\e071"; }
+
+.timecontrol-loop:before {
+  content: "\e030"; }
+
+@media (max-width: 767px) {
+  .leaflet-bar-timecontrol .timecontrol-date,
+  .leaflet-bar-timecontrol .timecontrol-slider {
+    clear: both;
+    float: none;
+    border-right: none; } }
+
+.leaflet-touch .leaflet-bar-timecontrol .leaflet-control-timecontrol {
+  height: 30px;
+  line-height: 30px; }
+
+.leaflet-touch .timecontrol-slider .slider {
+  margin-top: 10px; }
+
+#map {
+  height: 100vh;
+  width: 100vw; }
+
+.leaflet-bottom.leaflet-left {
+  width: 100%; }
+
+.leaflet-control-container .leaflet-timeline-controls {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  margin-bottom: 15px; }
+
+.marker-cluster-small {
+  background-color: rgba(181, 226, 140, 0.6); }
+
+.marker-cluster-small div {
+  background-color: rgba(110, 204, 57, 0.6); }
+
+.marker-cluster-medium {
+  background-color: rgba(241, 211, 87, 0.6); }
+
+.marker-cluster-medium div {
+  background-color: rgba(240, 194, 12, 0.6); }
+
+.marker-cluster-large {
+  background-color: rgba(253, 156, 115, 0.6); }
+
+.marker-cluster-large div {
+  background-color: rgba(241, 128, 23, 0.6); }
+
+/* IE 6-8 fallback colors */
+.leaflet-oldie .marker-cluster-small {
+  background-color: #b5e28c; }
+
+.leaflet-oldie .marker-cluster-small div {
+  background-color: #6ecc39; }
+
+.leaflet-oldie .marker-cluster-medium {
+  background-color: #f1d357; }
+
+.leaflet-oldie .marker-cluster-medium div {
+  background-color: #f0c20c; }
+
+.leaflet-oldie .marker-cluster-large {
+  background-color: #fd9c73; }
+
+.leaflet-oldie .marker-cluster-large div {
+  background-color: #f18017; }
+
+.marker-cluster {
+  background-clip: padding-box;
+  border-radius: 20px; }
+
+.marker-cluster div {
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  text-align: center;
+  border-radius: 15px;
+  font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif; }
+
+.marker-cluster span {
+  line-height: 30px; }
+
+.leaflet-cluster-anim .leaflet-marker-icon, .leaflet-cluster-anim .leaflet-marker-shadow {
+  -webkit-transition: -webkit-transform 0.3s ease-out, opacity 0.3s ease-in;
+  -moz-transition: -moz-transform 0.3s ease-out, opacity 0.3s ease-in;
+  -o-transition: -o-transform 0.3s ease-out, opacity 0.3s ease-in;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-in; }
+
+.leaflet-cluster-spider-leg {
+  /* stroke-dashoffset (duration and function) should match with leaflet-marker-icon transform in order to track it exactly */
+  -webkit-transition: -webkit-stroke-dashoffset 0.3s ease-out, -webkit-stroke-opacity 0.3s ease-in;
+  -moz-transition: -moz-stroke-dashoffset 0.3s ease-out, -moz-stroke-opacity 0.3s ease-in;
+  -o-transition: -o-stroke-dashoffset 0.3s ease-out, -o-stroke-opacity 0.3s ease-in;
+  transition: stroke-dashoffset 0.3s ease-out, stroke-opacity 0.3s ease-in; }
+
+/**
+ * @license Highcharts
+ *
+ * (c) 2009-2016 Torstein Honsi
+ *
+ * License: www.highcharts.com/license
+ */
+.highcharts-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  line-height: normal;
+  z-index: 0;
+  /* #1072 */
+  -webkit-tap-highlight-color: transparent;
+  font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+  font-size: 12px; }
+
+.highcharts-root {
+  display: block; }
+
+.highcharts-root text {
+  stroke-width: 0; }
+
+.highcharts-strong {
+  font-weight: bold; }
+
+.highcharts-emphasized {
+  font-style: italic; }
+
+.highcharts-anchor {
+  cursor: pointer; }
+
+.highcharts-background {
+  fill: #ffffff; }
+
+.highcharts-plot-border, .highcharts-plot-background {
+  fill: none; }
+
+.highcharts-label-box {
+  fill: none; }
+
+.highcharts-button-box {
+  fill: inherit; }
+
+/* Titles */
+.highcharts-title {
+  fill: #333333;
+  font-size: 1.5em; }
+
+.highcharts-subtitle {
+  fill: #666666; }
+
+/* Axes */
+.highcharts-axis-line {
+  fill: none;
+  stroke: #ccd6eb; }
+
+.highcharts-yaxis .highcharts-axis-line {
+  stroke-width: 0; }
+
+.highcharts-axis-title {
+  fill: #666666; }
+
+.highcharts-axis-labels {
+  fill: #666666;
+  cursor: default;
+  font-size: 0.9em; }
+
+.highcharts-grid-line {
+  fill: none;
+  stroke: #e6e6e6; }
+
+.highcharts-xaxis-grid .highcharts-grid-line {
+  stroke-width: 0; }
+
+.highcharts-tick {
+  stroke: #ccd6eb; }
+
+.highcharts-yaxis .highcharts-tick {
+  stroke-width: 0; }
+
+.highcharts-minor-grid-line {
+  stroke: #f2f2f2; }
+
+.highcharts-crosshair-thin {
+  stroke-width: 1px;
+  stroke: #cccccc; }
+
+.highcharts-crosshair-category {
+  stroke: #ccd6eb;
+  stroke-opacity: 0.25; }
+
+/* Credits */
+.highcharts-credits {
+  cursor: pointer;
+  fill: #999999;
+  font-size: 0.7em;
+  transition: fill 250ms, font-size 250ms; }
+
+.highcharts-credits:hover {
+  fill: black;
+  font-size: 1em; }
+
+/* Tooltip */
+.highcharts-tooltip {
+  cursor: default;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: stroke 150ms; }
+
+.highcharts-tooltip text {
+  fill: #333333; }
+
+.highcharts-tooltip .highcharts-header {
+  font-size: 0.85em; }
+
+.highcharts-tooltip-box {
+  stroke-width: 1px;
+  fill: #f7f7f7;
+  fill-opacity: 0.85; }
+
+.highcharts-tooltip-box .highcharts-label-box {
+  fill: #f7f7f7;
+  fill-opacity: 0.85; }
+
+.highcharts-selection-marker {
+  fill: #335cad;
+  fill-opacity: 0.25; }
+
+.highcharts-graph {
+  fill: none;
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-linejoin: round; }
+
+.highcharts-state-hover .highcharts-graph {
+  stroke-width: 3; }
+
+.highcharts-state-hover path {
+  transition: stroke-width 50;
+  /* quick in */ }
+
+.highcharts-state-normal path {
+  transition: stroke-width 250ms;
+  /* slow out */ }
+
+/* Legend hover affects points and series */
+g.highcharts-series,
+.highcharts-point,
+.highcharts-markers,
+.highcharts-data-labels {
+  transition: opacity 250ms; }
+
+.highcharts-legend-series-active g.highcharts-series:not(.highcharts-series-hover),
+.highcharts-legend-point-active .highcharts-point:not(.highcharts-point-hover),
+.highcharts-legend-series-active .highcharts-markers:not(.highcharts-series-hover),
+.highcharts-legend-series-active .highcharts-data-labels:not(.highcharts-series-hover) {
+  opacity: 0.2; }
+
+/* Series options */
+/* Default colors */
+.highcharts-color-0 {
+  fill: #7cb5ec;
+  stroke: #7cb5ec; }
+
+.highcharts-color-1 {
+  fill: #434348;
+  stroke: #434348; }
+
+.highcharts-color-2 {
+  fill: #90ed7d;
+  stroke: #90ed7d; }
+
+.highcharts-color-3 {
+  fill: #f7a35c;
+  stroke: #f7a35c; }
+
+.highcharts-color-4 {
+  fill: #8085e9;
+  stroke: #8085e9; }
+
+.highcharts-color-5 {
+  fill: #f15c80;
+  stroke: #f15c80; }
+
+.highcharts-color-6 {
+  fill: #e4d354;
+  stroke: #e4d354; }
+
+.highcharts-color-7 {
+  fill: #2b908f;
+  stroke: #2b908f; }
+
+.highcharts-color-8 {
+  fill: #f45b5b;
+  stroke: #f45b5b; }
+
+.highcharts-color-9 {
+  fill: #91e8e1;
+  stroke: #91e8e1; }
+
+.highcharts-area {
+  fill-opacity: 0.75;
+  stroke-width: 0; }
+
+.highcharts-markers {
+  stroke-width: 1px;
+  stroke: #ffffff; }
+
+.highcharts-point {
+  stroke-width: 1px; }
+
+.highcharts-dense-data .highcharts-point {
+  stroke-width: 0; }
+
+.highcharts-data-label {
+  font-size: 0.9em;
+  font-weight: bold; }
+
+.highcharts-data-label-box {
+  fill: none;
+  stroke-width: 0; }
+
+.highcharts-data-label text, text.highcharts-data-label {
+  fill: #333333; }
+
+.highcharts-data-label-connector {
+  fill: none; }
+
+.highcharts-halo {
+  fill-opacity: 0.25;
+  stroke-width: 0; }
+
+.highcharts-series:not(.highcharts-pie-series) .highcharts-point-select {
+  fill: #cccccc;
+  stroke: #000000; }
+
+.highcharts-column-series rect.highcharts-point {
+  stroke: #ffffff; }
+
+.highcharts-column-series .highcharts-point {
+  transition: fill-opacity 250ms; }
+
+.highcharts-column-series .highcharts-point-hover {
+  fill-opacity: 0.75;
+  transition: fill-opacity 50ms; }
+
+.highcharts-pie-series .highcharts-point {
+  stroke-linejoin: round;
+  stroke: #ffffff; }
+
+.highcharts-pie-series .highcharts-point-hover {
+  fill-opacity: 0.75;
+  transition: fill-opacity 50ms; }
+
+.highcharts-funnel-series .highcharts-point {
+  stroke-linejoin: round;
+  stroke: #ffffff; }
+
+.highcharts-funnel-series .highcharts-point-hover {
+  fill-opacity: 0.75;
+  transition: fill-opacity 50ms; }
+
+.highcharts-funnel-series .highcharts-point-select {
+  fill: inherit;
+  stroke: inherit; }
+
+.highcharts-pyramid-series .highcharts-point {
+  stroke-linejoin: round;
+  stroke: #ffffff; }
+
+.highcharts-pyramid-series .highcharts-point-hover {
+  fill-opacity: 0.75;
+  transition: fill-opacity 50ms; }
+
+.highcharts-pyramid-series .highcharts-point-select {
+  fill: inherit;
+  stroke: inherit; }
+
+.highcharts-solidgauge-series .highcharts-point {
+  stroke-width: 0; }
+
+.highcharts-treemap-series .highcharts-point {
+  stroke-width: 1px;
+  stroke: #e6e6e6;
+  transition: stroke 250ms, fill 250ms, fill-opacity 250ms; }
+
+.highcharts-treemap-series .highcharts-point-hover {
+  stroke: #999999;
+  transition: stroke 25ms, fill 25ms, fill-opacity 25ms; }
+
+.highcharts-treemap-series .highcharts-above-level {
+  display: none; }
+
+.highcharts-treemap-series .highcharts-internal-node {
+  fill: none; }
+
+.highcharts-treemap-series .highcharts-internal-node-interactive {
+  fill-opacity: 0.15;
+  cursor: pointer; }
+
+.highcharts-treemap-series .highcharts-internal-node-interactive:hover {
+  fill-opacity: 0.75; }
+
+/* Legend */
+.highcharts-legend-box {
+  fill: none;
+  stroke-width: 0; }
+
+.highcharts-legend-item text {
+  fill: #333333;
+  font-weight: bold;
+  cursor: pointer;
+  stroke-width: 0; }
+
+.highcharts-legend-item:hover text {
+  fill: #000000; }
+
+.highcharts-legend-item-hidden * {
+  fill: #cccccc !important;
+  stroke: #cccccc !important;
+  transition: fill 250ms; }
+
+.highcharts-legend-nav-active {
+  fill: #003399;
+  cursor: pointer; }
+
+.highcharts-legend-nav-inactive {
+  fill: #cccccc; }
+
+.highcharts-legend-title-box {
+  fill: none;
+  stroke-width: 0; }
+
+/* Loading */
+.highcharts-loading {
+  position: absolute;
+  background-color: #ffffff;
+  opacity: 0.5;
+  text-align: center;
+  z-index: 10;
+  transition: opacity 250ms; }
+
+.highcharts-loading-hidden {
+  height: 0 !important;
+  opacity: 0;
+  overflow: hidden;
+  transition: opacity 250ms, height 250ms step-end; }
+
+.highcharts-loading-inner {
+  font-weight: bold;
+  position: relative;
+  top: 45%; }
+
+/* Plot bands and polar pane backgrounds */
+.highcharts-plot-band, .highcharts-pane {
+  fill: #000000;
+  fill-opacity: 0.05; }
+
+.highcharts-plot-line {
+  fill: none;
+  stroke: #999999;
+  stroke-width: 1px; }
+
+/* Highcharts More and modules */
+.highcharts-boxplot-box {
+  fill: #ffffff; }
+
+.highcharts-boxplot-median {
+  stroke-width: 2px; }
+
+.highcharts-bubble-series .highcharts-point {
+  fill-opacity: 0.5; }
+
+.highcharts-errorbar-series .highcharts-point {
+  stroke: #000000; }
+
+.highcharts-gauge-series .highcharts-data-label-box {
+  stroke: #cccccc;
+  stroke-width: 1px; }
+
+.highcharts-gauge-series .highcharts-dial {
+  fill: #000000;
+  stroke-width: 0; }
+
+.highcharts-polygon-series .highcharts-graph {
+  fill: inherit;
+  stroke-width: 0; }
+
+.highcharts-waterfall-series .highcharts-graph {
+  stroke: #333333;
+  stroke-dasharray: 1, 3; }
+
+.highcharts-sankey-series .highcharts-point {
+  stroke-width: 0; }
+
+.highcharts-sankey-series .highcharts-link {
+  transition: fill 250ms, fill-opacity 250ms;
+  fill-opacity: 0.5; }
+
+.highcharts-sankey-series .highcharts-point-hover.highcharts-link {
+  transition: fill 50ms, fill-opacity 50ms;
+  fill-opacity: 1; }
+
+/* Highstock */
+.highcharts-navigator-mask-outside {
+  fill-opacity: 0; }
+
+.highcharts-navigator-mask-inside {
+  fill: #6685c2;
+  /* navigator.maskFill option */
+  fill-opacity: 0.25;
+  cursor: ew-resize; }
+
+.highcharts-navigator-outline {
+  stroke: #cccccc;
+  fill: none; }
+
+.highcharts-navigator-handle {
+  stroke: #cccccc;
+  fill: #f2f2f2;
+  cursor: ew-resize; }
+
+.highcharts-navigator-series {
+  fill: #335cad;
+  stroke: #335cad; }
+
+.highcharts-navigator-series .highcharts-graph {
+  stroke-width: 1px; }
+
+.highcharts-navigator-series .highcharts-area {
+  fill-opacity: 0.05; }
+
+.highcharts-navigator-xaxis .highcharts-axis-line {
+  stroke-width: 0; }
+
+.highcharts-navigator-xaxis .highcharts-grid-line {
+  stroke-width: 1px;
+  stroke: #e6e6e6; }
+
+.highcharts-navigator-xaxis.highcharts-axis-labels {
+  fill: #999999; }
+
+.highcharts-navigator-yaxis .highcharts-grid-line {
+  stroke-width: 0; }
+
+.highcharts-scrollbar-thumb {
+  fill: #cccccc;
+  stroke: #cccccc;
+  stroke-width: 1px; }
+
+.highcharts-scrollbar-button {
+  fill: #e6e6e6;
+  stroke: #cccccc;
+  stroke-width: 1px; }
+
+.highcharts-scrollbar-arrow {
+  fill: #666666; }
+
+.highcharts-scrollbar-rifles {
+  stroke: #666666;
+  stroke-width: 1px; }
+
+.highcharts-scrollbar-track {
+  fill: #f2f2f2;
+  stroke: #f2f2f2;
+  stroke-width: 1px; }
+
+.highcharts-button {
+  fill: #f7f7f7;
+  stroke: #cccccc;
+  cursor: default;
+  stroke-width: 1px;
+  transition: fill 250ms; }
+
+.highcharts-button text {
+  fill: #333333; }
+
+.highcharts-button-hover {
+  transition: fill 0ms;
+  fill: #e6e6e6;
+  stroke: #333333; }
+
+.highcharts-button-pressed {
+  font-weight: bold;
+  fill: #e6ebf5;
+  stroke: #335cad; }
+
+.highcharts-button-disabled text {
+  fill: #cccccc; }
+
+.highcharts-range-selector-buttons .highcharts-button {
+  stroke-width: 0; }
+
+.highcharts-range-label rect {
+  fill: none; }
+
+.highcharts-range-label text {
+  fill: #666666; }
+
+.highcharts-range-input rect {
+  fill: none; }
+
+.highcharts-range-input text {
+  fill: #333333; }
+
+input.highcharts-range-selector {
+  position: absolute;
+  border: 0;
+  width: 1px;
+  /* Chrome needs a pixel to see it */
+  height: 1px;
+  padding: 0;
+  text-align: center;
+  left: -9em;
+  /* #4798 */ }
+
+.highcharts-crosshair-label text {
+  fill: #ffffff;
+  font-size: 1.1em; }
+
+.highcharts-crosshair-label .highcharts-label-box {
+  fill: inherit; }
+
+.highcharts-candlestick-series .highcharts-point {
+  stroke: #000000;
+  stroke-width: 1px; }
+
+.highcharts-candlestick-series .highcharts-point-up {
+  fill: #ffffff; }
+
+.highcharts-ohlc-series .highcharts-point-hover {
+  stroke-width: 3px; }
+
+.highcharts-flags-series .highcharts-point .highcharts-label-box {
+  stroke: #999999;
+  fill: #ffffff;
+  transition: fill 250ms; }
+
+.highcharts-flags-series .highcharts-point-hover .highcharts-label-box {
+  stroke: #000000;
+  fill: #ccd6eb; }
+
+.highcharts-flags-series .highcharts-point text {
+  fill: #000000;
+  font-size: 0.9em;
+  font-weight: bold; }
+
+/* Highmaps */
+.highcharts-map-series .highcharts-point {
+  transition: fill 500ms, fill-opacity 500ms, stroke-width 250ms;
+  stroke: #cccccc; }
+
+.highcharts-map-series .highcharts-point-hover {
+  transition: fill 0ms, fill-opacity 0ms;
+  fill-opacity: 0.5;
+  stroke-width: 2px; }
+
+.highcharts-mapline-series .highcharts-point {
+  fill: none; }
+
+.highcharts-heatmap-series .highcharts-point {
+  stroke-width: 0; }
+
+.highcharts-map-navigation {
+  font-size: 1.3em;
+  font-weight: bold;
+  text-align: center; }
+
+.highcharts-coloraxis {
+  stroke-width: 0; }
+
+.highcharts-coloraxis-marker {
+  fill: #999999; }
+
+.highcharts-null-point {
+  fill: #f7f7f7; }
+
+/* 3d charts */
+.highcharts-3d-frame {
+  fill: transparent; }
+
+/* Exporting module */
+.highcharts-contextbutton {
+  fill: #ffffff;
+  /* needed to capture hover */
+  stroke: none;
+  stroke-linecap: round; }
+
+.highcharts-contextbutton:hover {
+  fill: #e6e6e6;
+  stroke: #e6e6e6; }
+
+.highcharts-button-symbol {
+  stroke: #666666;
+  stroke-width: 3px; }
+
+.highcharts-menu {
+  border: 1px solid #999999;
+  background: #ffffff;
+  padding: 5px 0;
+  box-shadow: 3px 3px 10px #888; }
+
+.highcharts-menu-item {
+  padding: 0.5em 1em;
+  background: none;
+  color: #333333;
+  cursor: pointer;
+  transition: background 250ms, color 250ms; }
+
+.highcharts-menu-item:hover {
+  background: #335cad;
+  color: #ffffff; }
+
+/* Drilldown module */
+.highcharts-drilldown-point {
+  cursor: pointer; }
+
+.highcharts-drilldown-data-label text,
+text.highcharts-drilldown-data-label,
+.highcharts-drilldown-axis-label {
+  cursor: pointer;
+  fill: #003399;
+  font-weight: bold;
+  text-decoration: underline; }
+
+/* No-data module */
+.highcharts-no-data text {
+  font-weight: bold;
+  font-size: 12px;
+  fill: #666666; }
+
+/* Drag-panes module */
+.highcharts-axis-resizer {
+  cursor: ns-resize;
+  stroke: black;
+  stroke-width: 2px; }
+
+/* Bullet type series */
+.highcharts-bullet-target {
+  stroke-width: 0; }
+
+/* Lineargauge type series */
+.highcharts-lineargauge-target {
+  stroke-width: 1px;
+  stroke: #333333; }
+
+.highcharts-lineargauge-target-line {
+  stroke-width: 1px;
+  stroke: #333333; }
+
+/* Annotations module */
+.highcharts-annotation-label-box {
+  stroke-width: 1px;
+  stroke: #000000;
+  fill: #000000;
+  fill-opacity: 0.75; }
+
+.highcharts-annotation-label text {
+  fill: #e6e6e6; }
+
+@charset "UTF-8";
+/* Ion.RangeSlider
+// css version 2.0.3
+// © 2013-2014 Denis Ineshin | IonDen.com
+// ===================================================================================================================*/
+/* =====================================================================================================================
+// RangeSlider */
+.irs {
+  position: relative;
+  display: block;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
+
+.irs-line {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  outline: none !important; }
+
+.irs-line-left, .irs-line-mid, .irs-line-right {
+  position: absolute;
+  display: block;
+  top: 0; }
+
+.irs-line-left {
+  left: 0;
+  width: 11%; }
+
+.irs-line-mid {
+  left: 9%;
+  width: 82%; }
+
+.irs-line-right {
+  right: 0;
+  width: 11%; }
+
+.irs-bar {
+  position: absolute;
+  display: block;
+  left: 0;
+  width: 0; }
+
+.irs-bar-edge {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0; }
+
+.irs-shadow {
+  position: absolute;
+  display: none;
+  left: 0;
+  width: 0; }
+
+.irs-slider {
+  position: absolute;
+  display: block;
+  cursor: default;
+  z-index: 1; }
+
+.irs-slider.type_last {
+  z-index: 2; }
+
+.irs-min {
+  position: absolute;
+  display: block;
+  left: 0;
+  cursor: default; }
+
+.irs-max {
+  position: absolute;
+  display: block;
+  right: 0;
+  cursor: default; }
+
+.irs-from, .irs-to, .irs-single {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  cursor: default;
+  white-space: nowrap; }
+
+.irs-grid {
+  position: absolute;
+  display: none;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 20px; }
+
+.irs-with-grid .irs-grid {
+  display: block; }
+
+.irs-grid-pol {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 8px;
+  background: #000; }
+
+.irs-grid-pol.small {
+  height: 4px; }
+
+.irs-grid-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  white-space: nowrap;
+  text-align: center;
+  font-size: 9px;
+  line-height: 9px;
+  padding: 0 3px;
+  color: #000; }
+
+.irs-disable-mask {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: -1%;
+  width: 102%;
+  height: 100%;
+  cursor: default;
+  background: transparent;
+  z-index: 2; }
+
+.lt-ie9 .irs-disable-mask {
+  background: #000;
+  filter: alpha(opacity=0);
+  cursor: not-allowed; }
+
+.irs-disabled {
+  opacity: 0.4; }
+
+.irs-hidden-input {
+  position: absolute !important;
+  display: block !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden;
+  outline: none !important;
+  z-index: -9999 !important;
+  background: none !important;
+  border-style: solid !important;
+  border-color: transparent !important; }
+
+@charset "UTF-8";
+/* Ion.RangeSlider, Modern Skin
+// css version 2.0.3
+// © Denis Ineshin, 2014    https://github.com/IonDen
+// ===================================================================================================================*/
+/* =====================================================================================================================
+// Skin details */
+.irs-line-mid,
+.irs-line-left,
+.irs-line-right,
+.irs-bar,
+.irs-bar-edge,
+.irs-slider {
+  background: url(../img/sprite-skin-modern.png) repeat-x; }
+
+.irs {
+  height: 50px; }
+
+.irs-with-grid {
+  height: 70px; }
+
+.irs-line {
+  height: 6px;
+  top: 25px; }
+
+.irs-line-left {
+  height: 6px;
+  background-position: 0 -30px; }
+
+.irs-line-mid {
+  height: 6px;
+  background-position: 0 0; }
+
+.irs-line-right {
+  height: 6px;
+  background-position: 100% -30px; }
+
+.irs-bar {
+  height: 6px;
+  top: 25px;
+  background-position: 0 -60px; }
+
+.irs-bar-edge {
+  top: 25px;
+  height: 6px;
+  width: 6px;
+  background-position: 0 -90px; }
+
+.irs-shadow {
+  height: 5px;
+  top: 25px;
+  background: #000;
+  opacity: 0.25; }
+
+.lt-ie9 .irs-shadow {
+  filter: alpha(opacity=25); }
+
+.irs-slider {
+  width: 11px;
+  height: 18px;
+  top: 31px;
+  background-position: 0 -120px; }
+
+.irs-slider.state_hover, .irs-slider:hover {
+  background-position: 0 -150px; }
+
+.irs-min, .irs-max {
+  color: #999;
+  font-size: 10px;
+  line-height: 1.333;
+  text-shadow: none;
+  top: 0;
+  padding: 1px 3px;
+  background: #e1e4e9;
+  -moz-border-radius: 4px;
+  border-radius: 4px; }
+
+.irs-from, .irs-to, .irs-single {
+  color: #fff;
+  font-size: 10px;
+  line-height: 1.333;
+  text-shadow: none;
+  padding: 1px 5px;
+  background: #20b426;
+  -moz-border-radius: 4px;
+  border-radius: 4px; }
+
+.irs-from:after, .irs-to:after, .irs-single:after {
+  position: absolute;
+  display: block;
+  content: "";
+  bottom: -6px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  margin-left: -3px;
+  overflow: hidden;
+  border: 3px solid transparent;
+  border-top-color: #20b426; }
+
+.irs-grid {
+  height: 34px; }
+
+.irs-grid-pol {
+  background: #c0c0c0; }
+
+.irs-grid-text {
+  bottom: 12px;
+  color: #c0c0c0; }
+
+/*! normalize.css v3.0.2 | MIT License | git.io/normalize */
+/**
+ * 1. Set default font family to sans-serif.
+ * 2. Prevent iOS text size adjust after orientation change, without disabling
+ *    user zoom.
+ */
+html {
+  font-family: sans-serif;
+  /* 1 */
+  -ms-text-size-adjust: 100%;
+  /* 2 */
+  -webkit-text-size-adjust: 100%;
+  /* 2 */ }
+
+/**
+ * Remove default margin.
+ */
+body {
+  margin: 0; }
+
+/* HTML5 display definitions
+   ========================================================================== */
+/**
+ * Correct `block` display not defined for any HTML5 element in IE 8/9.
+ * Correct `block` display not defined for `details` or `summary` in IE 10/11
+ * and Firefox.
+ * Correct `block` display not defined for `main` in IE 11.
+ */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block; }
+
+/**
+ * 1. Correct `inline-block` display not defined in IE 8/9.
+ * 2. Normalize vertical alignment of `progress` in Chrome, Firefox, and Opera.
+ */
+audio,
+canvas,
+progress,
+video {
+  display: inline-block;
+  /* 1 */
+  vertical-align: baseline;
+  /* 2 */ }
+
+/**
+ * Prevent modern browsers from displaying `audio` without controls.
+ * Remove excess height in iOS 5 devices.
+ */
+audio:not([controls]) {
+  display: none;
+  height: 0; }
+
+/**
+ * Address `[hidden]` styling not present in IE 8/9/10.
+ * Hide the `template` element in IE 8/9/11, Safari, and Firefox < 22.
+ */
+[hidden],
+template {
+  display: none; }
+
+/* Links
+   ========================================================================== */
+/**
+ * Remove the gray background color from active links in IE 10.
+ */
+a {
+  background-color: transparent; }
+
+/**
+ * Improve readability when focused and also mouse hovered in all browsers.
+ */
+a:active,
+a:hover {
+  outline: 0; }
+
+/* Text-level semantics
+   ========================================================================== */
+/**
+ * Address styling not present in IE 8/9/10/11, Safari, and Chrome.
+ */
+abbr[title] {
+  border-bottom: 1px dotted; }
+
+/**
+ * Address style set to `bolder` in Firefox 4+, Safari, and Chrome.
+ */
+b,
+strong {
+  font-weight: bold; }
+
+/**
+ * Address styling not present in Safari and Chrome.
+ */
+dfn {
+  font-style: italic; }
+
+/**
+ * Address variable `h1` font-size and margin within `section` and `article`
+ * contexts in Firefox 4+, Safari, and Chrome.
+ */
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0; }
+
+/**
+ * Address styling not present in IE 8/9.
+ */
+mark {
+  background: #ff0;
+  color: #000; }
+
+/**
+ * Address inconsistent and variable font size in all browsers.
+ */
+small {
+  font-size: 80%; }
+
+/**
+ * Prevent `sub` and `sup` affecting `line-height` in all browsers.
+ */
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline; }
+
+sup {
+  top: -0.5em; }
+
+sub {
+  bottom: -0.25em; }
+
+/* Embedded content
+   ========================================================================== */
+/**
+ * Remove border when inside `a` element in IE 8/9/10.
+ */
+img {
+  border: 0; }
+
+/**
+ * Correct overflow not hidden in IE 9/10/11.
+ */
+svg:not(:root) {
+  overflow: hidden; }
+
+/* Grouping content
+   ========================================================================== */
+/**
+ * Address margin not present in IE 8/9 and Safari.
+ */
+figure {
+  margin: 1em 40px; }
+
+/**
+ * Address differences between Firefox and other browsers.
+ */
+hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0; }
+
+/**
+ * Contain overflow in all browsers.
+ */
+pre {
+  overflow: auto; }
+
+/**
+ * Address odd `em`-unit font size rendering in all browsers.
+ */
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em; }
+
+/* Forms
+   ========================================================================== */
+/**
+ * Known limitation: by default, Chrome and Safari on OS X allow very limited
+ * styling of `select`, unless a `border` property is set.
+ */
+/**
+ * 1. Correct color not being inherited.
+ *    Known issue: affects color of disabled elements.
+ * 2. Correct font properties not being inherited.
+ * 3. Address margins set differently in Firefox 4+, Safari, and Chrome.
+ */
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit;
+  /* 1 */
+  font: inherit;
+  /* 2 */
+  margin: 0;
+  /* 3 */ }
+
+/**
+ * Address `overflow` set to `hidden` in IE 8/9/10/11.
+ */
+button {
+  overflow: visible; }
+
+/**
+ * Address inconsistent `text-transform` inheritance for `button` and `select`.
+ * All other form control elements do not inherit `text-transform` values.
+ * Correct `button` style inheritance in Firefox, IE 8/9/10/11, and Opera.
+ * Correct `select` style inheritance in Firefox.
+ */
+button,
+select {
+  text-transform: none; }
+
+/**
+ * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
+ *    and `video` controls.
+ * 2. Correct inability to style clickable `input` types in iOS.
+ * 3. Improve usability and consistency of cursor style between image-type
+ *    `input` and others.
+ */
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button;
+  /* 2 */
+  cursor: pointer;
+  /* 3 */ }
+
+/**
+ * Re-set default cursor for disabled elements.
+ */
+button[disabled],
+html input[disabled] {
+  cursor: default; }
+
+/**
+ * Remove inner padding and border in Firefox 4+.
+ */
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0; }
+
+/**
+ * Address Firefox 4+ setting `line-height` on `input` using `!important` in
+ * the UA stylesheet.
+ */
+input {
+  line-height: normal; }
+
+/**
+ * It's recommended that you don't attempt to style these elements.
+ * Firefox's implementation doesn't respect box-sizing, padding, or width.
+ *
+ * 1. Address box sizing set to `content-box` in IE 8/9/10.
+ * 2. Remove excess padding in IE 8/9/10.
+ */
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box;
+  /* 1 */
+  padding: 0;
+  /* 2 */ }
+
+/**
+ * Fix the cursor style for Chrome's increment/decrement buttons. For certain
+ * `font-size` values of the `input`, it causes the cursor style of the
+ * decrement button to change from `default` to `text`.
+ */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto; }
+
+/**
+ * 1. Address `appearance` set to `searchfield` in Safari and Chrome.
+ * 2. Address `box-sizing` set to `border-box` in Safari and Chrome
+ *    (include `-moz` to future-proof).
+ */
+input[type="search"] {
+  -webkit-appearance: textfield;
+  /* 1 */
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  /* 2 */
+  box-sizing: content-box; }
+
+/**
+ * Remove inner padding and search cancel button in Safari and Chrome on OS X.
+ * Safari (but not Chrome) clips the cancel button when the search input has
+ * padding (and `textfield` appearance).
+ */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none; }
+
+/**
+ * Define consistent border, margin, and padding.
+ */
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em; }
+
+/**
+ * 1. Correct `color` not being inherited in IE 8/9/10/11.
+ * 2. Remove padding so people aren't caught out if they zero out fieldsets.
+ */
+legend {
+  border: 0;
+  /* 1 */
+  padding: 0;
+  /* 2 */ }
+
+/**
+ * Remove default vertical scrollbar in IE 8/9/10/11.
+ */
+textarea {
+  overflow: auto; }
+
+/**
+ * Don't inherit the `font-weight` (applied by a rule above).
+ * NOTE: the default cannot safely be changed in Chrome and Safari on OS X.
+ */
+optgroup {
+  font-weight: bold; }
+
+/* Tables
+   ========================================================================== */
+/**
+ * Remove most spacing between table cells.
+ */
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+td,
+th {
+  padding: 0; }
